@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  api:
+    image: student-list:latest  # Nom de l'image Flask
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./student_age.json:/data/student_age.json
+    networks:
+      - pozos_network
+
+  web:
+    image: php:apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ../website:/var/www/html  # Monte le dossier du site web
+    environment:
+      USERNAME: "toto"
+      PASSWORD: "python"
+    depends_on:
+      - api
+    networks:
+      - pozos_network
+  registry:
+    image: registry:2
+    container_name: my_registry
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./data:/var/lib/registry
+    networks:
+      - pozos_network
+networks:
+  pozos_network:
+    driver: bridge
+volumes:
+  data:
